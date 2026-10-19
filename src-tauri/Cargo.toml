@@ -2,6 +2,7 @@
 name = "laverna"
 version = "0.1.0"
 description = "A minimal yt-dlp desktop app"
+license = "MIT"
 authors = ["Timmy Kouadio-Bhegnin"]
 edition = "2024"
 

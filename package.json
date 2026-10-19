@@ -1,7 +1,7 @@
 {
   "name": "laverna",
   "version": "0.1.0",
-  "description": "",
+  "description": "A minimal yt-dlp desktop app",
   "type": "module",
   "scripts": {
     "dev": "vite dev",

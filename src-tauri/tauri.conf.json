@@ -32,10 +32,27 @@
     ],
     "icon": [
       "icons/32x32.png",
+      "icons/64x64.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
+      "icons/icon.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "category": "Video",
+    "publisher": "Timmy Kouadio-Bhegnin",
+    "shortDescription": "A minimal desktop app for downloading videos with yt-dlp",
+    "longDescription": "Laverna queues videos and downloads them one after the other with yt-dlp, with selectable quality, subtitles, and a customizable theme.",
+    "linux": {
+      "deb": {
+        "recommends": [
+          "yt-dlp",
+          "ffmpeg"
+        ],
+        "section": "video"
+      }
+    },
+    "license": "MIT",
+    "licenseFile": "../LICENSE"
   }
 }
