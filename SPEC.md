@@ -83,7 +83,10 @@ yt-dlp-supported URL works), with a sequential download queue and a user-customi
 - User file `~/.config/laverna/theme.css` overrides the preset and is watched for live reload.
 - The in-app theme editor (color pickers, plus text fields for non-colors, and "reset to preset")
   edits those variables and writes them back to the same file, keeping any other hand-written
-  CSS intact.
+  CSS intact. It owns one marked block (`/* laverna:editor:start … */ … /* laverna:editor:end */`)
+  kept at the end of the file; its overrides apply in both modes.
+- Presets use zero-specificity selectors (`:where()`), so any user `:root { … }` rule wins.
+- Mode setting: Follow system (default) / Dark / Light.
 - Omarchy theme import: later, not v1.
 
 ## Settings
@@ -97,3 +100,6 @@ Stored in `~/.config/laverna/settings.json`, next to `theme.css`:
 - Cookies from browser (dropdown, default off)
 - Rate limit (`-r`, default empty)
 - Extra yt-dlp args (free text, appended last)
+- Theme mode (system / dark / light)
+
+Settings autosave on change. Invalid extra args are rejected with an inline error.

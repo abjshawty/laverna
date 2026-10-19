@@ -3,6 +3,7 @@ mod core;
 mod queue;
 mod resolver;
 mod settings;
+mod theme;
 mod tools;
 mod worker;
 mod ytdlp;
@@ -33,6 +34,7 @@ pub fn run() {
             for id in core.read(|q| q.unresolved()) {
                 resolver::spawn(core.clone(), id);
             }
+            tauri::async_runtime::spawn(theme::watch(core.clone()));
             tauri::async_runtime::spawn(worker::run(core));
             Ok(())
         })
@@ -60,6 +62,8 @@ pub fn run() {
             commands::save_settings,
             commands::detect_tools,
             commands::read_theme,
+            commands::get_theme_vars,
+            commands::set_theme_vars,
             commands::get_queue,
             commands::add_urls,
             commands::remove_item,

@@ -3,9 +3,14 @@
  * Users override them in ~/.config/laverna/theme.css (loaded after this file).
  */
 
+/*
+ * Presets are wrapped in :where() (zero specificity) so a plain `:root { … }`
+ * in the user's file always wins, whatever the mode.
+ */
+
 /* Dark preset */
-:root,
-:root[data-theme="dark"] {
+:where(:root),
+:where(:root[data-theme="dark"]) {
   --bg: #16161a;
   --surface: #1f1f25;
   --surface-hover: #27272f;
@@ -26,7 +31,7 @@
 
 /* Light preset: follows the system unless the user forces a theme. */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
+  :where(:root:not([data-theme="dark"])) {
     --bg: #f7f7f9;
     --surface: #ffffff;
     --surface-hover: #f0f0f4;
@@ -42,7 +47,7 @@
     color-scheme: light;
   }
 }
-:root[data-theme="light"] {
+:where(:root[data-theme="light"]) {
   --bg: #f7f7f9;
   --surface: #ffffff;
   --surface-hover: #f0f0f4;
@@ -83,6 +88,20 @@ select {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 6px 10px;
+}
+
+/* Native GTK selects ignore the theme; draw our own arrow from theme colors. */
+select {
+  appearance: none;
+  padding-right: 28px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) 50%,
+    calc(100% - 10px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
 }
 
 button {

@@ -23,7 +23,10 @@ export interface Settings {
   cookies_from_browser: string | null;
   rate_limit: string;
   extra_args: string;
+  theme_mode: ThemeMode;
 }
+
+export type ThemeMode = "system" | "dark" | "light";
 
 export interface ItemOptions {
   preset: Preset;

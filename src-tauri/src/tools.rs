@@ -18,10 +18,18 @@ pub async fn detect(name: &str, override_path: Option<&Path>, version_flag: &str
             .ok()
             .filter(|o| o.status.success())
             .and_then(|o| String::from_utf8(o.stdout).ok())
-            .and_then(|s| s.lines().next().map(str::to_string)),
+            .and_then(|s| s.lines().next().map(|l| short_version(name, l))),
         None => None,
     };
     ToolInfo { path, version }
+}
+
+/// ffmpeg prints `ffmpeg version n9.0.1 Copyright (c) …`; keep just the version.
+fn short_version(name: &str, line: &str) -> String {
+    line.strip_prefix(&format!("{name} version "))
+        .and_then(|rest| rest.split_whitespace().next())
+        .unwrap_or(line)
+        .to_string()
 }
 
 /// An explicit override wins (and must exist); otherwise `PATH` is searched.
@@ -37,4 +45,14 @@ fn find_in_path(name: &str) -> Option<PathBuf> {
     std::env::split_paths(&std::env::var_os("PATH")?)
         .map(|dir| dir.join(&exe))
         .find(|p| p.is_file())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn short_version() {
+        let ff = "ffmpeg version n9.0.1 Copyright (c) 2000-2026 the FFmpeg developers";
+        assert_eq!(super::short_version("ffmpeg", ff), "n9.0.1");
+        assert_eq!(super::short_version("yt-dlp", "2026.08.19"), "2026.08.19");
+    }
 }

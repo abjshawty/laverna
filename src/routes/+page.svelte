@@ -3,6 +3,8 @@
   import { onMount } from "svelte";
   import { api } from "$lib/api";
   import QueueRow from "$lib/QueueRow.svelte";
+  import SettingsPanel from "$lib/SettingsPanel.svelte";
+  import { applyMode } from "$lib/theme.svelte";
   import { PRESETS, type Item, type Preset, type Progress, type Queue, type Settings, type ToolInfo } from "$lib/types";
 
   const ITEM_MIME = "application/x-laverna-item";
@@ -34,6 +36,7 @@
     ];
     (async () => {
       settings = await api.getSettings();
+      applyMode(settings.theme_mode);
       preset = settings.default_preset;
       subtitles = settings.subtitles.include_by_default;
       queue = await api.getQueue();
@@ -85,6 +88,20 @@
 
   async function showLog(item: Item) {
     logFor = { item, lines: await api.getLog(item.id) };
+  }
+
+  async function settingsSaved(next: Settings) {
+    const prev = settings;
+    settings = next;
+    applyMode(next.theme_mode);
+    // Keep the add bar in step with new defaults.
+    if (prev?.default_preset !== next.default_preset) preset = next.default_preset;
+    if (prev?.subtitles.include_by_default !== next.subtitles.include_by_default) {
+      subtitles = next.subtitles.include_by_default;
+    }
+    if (prev?.ytdlp_path !== next.ytdlp_path || prev?.ffmpeg_path !== next.ffmpeg_path) {
+      tools = await api.detectTools();
+    }
   }
 
   function togglePause() {
@@ -168,28 +185,15 @@
   </div>
 {/if}
 
-{#if settingsOpen}
-  <div class="scrim" role="presentation" onclick={() => (settingsOpen = false)}></div>
-  <aside class="settings" aria-label="Settings">
-    <header>
-      <h2>Settings</h2>
-      <button type="button" class="icon" aria-label="Close" onclick={() => (settingsOpen = false)}>✕</button>
-    </header>
-    <h3>Tools</h3>
-    <dl>
-      <dt>yt-dlp</dt>
-      <dd>{tools?.ytdlp.version ?? "not found"} <span class="muted">{tools?.ytdlp.path ?? ""}</span></dd>
-      <dt>ffmpeg</dt>
-      <dd>{tools?.ffmpeg.version ?? "not found"} <span class="muted">{tools?.ffmpeg.path ?? ""}</span></dd>
-    </dl>
-    <p class="muted">Download, subtitle, and theme settings coming next.</p>
-  </aside>
+{#if settingsOpen && settings}
+  <SettingsPanel {settings} {tools} onSaved={settingsSaved} onClose={() => (settingsOpen = false)} />
 {/if}
 
 <style>
+  /* Flex, not grid: the banner is conditional, so fixed grid rows would shift. */
   main {
-    display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
   }
   main.dropping .queue {
@@ -228,6 +232,8 @@
   }
 
   .queue {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
   }
   .empty {
@@ -258,17 +264,6 @@
     position: fixed;
     inset: 0;
     background: rgb(0 0 0 / 0.3);
-  }
-  .settings {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(380px, 90vw);
-    padding: 16px;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    overflow-y: auto;
   }
   .log {
     position: fixed;
@@ -301,24 +296,4 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  h3 {
-    font-size: 0.85em;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    margin: 20px 0 8px;
-  }
-  dl {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 6px 12px;
-    margin: 0;
-  }
-  dd {
-    margin: 0;
-    overflow-wrap: anywhere;
-  }
-  .muted {
-    color: var(--muted);
-  }
-</style>
+ </style>

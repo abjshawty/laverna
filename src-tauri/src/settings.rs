@@ -61,6 +61,16 @@ pub enum AudioFormat {
     M4a,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum ThemeMode {
+    /// Follow `prefers-color-scheme`.
+    #[default]
+    System,
+    Dark,
+    Light,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct SubtitleSettings {
@@ -97,6 +107,7 @@ pub struct Settings {
     pub rate_limit: String,
     /// Free text, shell-split and appended last.
     pub extra_args: String,
+    pub theme_mode: ThemeMode,
 }
 
 impl Default for Settings {
@@ -113,6 +124,7 @@ impl Default for Settings {
             cookies_from_browser: None,
             rate_limit: String::new(),
             extra_args: String::new(),
+            theme_mode: ThemeMode::System,
         }
     }
 }

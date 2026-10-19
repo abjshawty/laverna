@@ -2,9 +2,11 @@ use crate::core::Core;
 use crate::queue::{ItemId, Queue, QueueError};
 use crate::resolver;
 use crate::settings::Settings;
+use crate::theme;
 use crate::tools::{self, ToolInfo};
 use crate::ytdlp::args::ItemOptions;
 use serde::Serialize;
+use std::collections::BTreeMap;
 use std::sync::Arc;
 use tauri::State;
 
@@ -30,6 +32,7 @@ pub fn get_settings(core: State<Arc<Core>>) -> Settings {
 
 #[tauri::command]
 pub fn save_settings(core: State<Arc<Core>>, settings: Settings) -> Res {
+    shell_words::split(&settings.extra_args).map_err(|e| format!("Extra arguments: {e}"))?;
     settings.save(&core.paths.settings).map_err(|e| e.to_string())?;
     *core.settings.lock().unwrap() = settings;
     // A newly configured yt-dlp path may unblock the worker and pending lookups.
@@ -53,6 +56,23 @@ pub async fn detect_tools(core: State<'_, Arc<Core>>) -> Res<Tools> {
 #[tauri::command]
 pub fn read_theme(core: State<Arc<Core>>) -> String {
     std::fs::read_to_string(&core.paths.theme).unwrap_or_default()
+}
+
+#[tauri::command]
+pub fn get_theme_vars(core: State<Arc<Core>>) -> BTreeMap<String, String> {
+    theme::editor_vars(&std::fs::read_to_string(&core.paths.theme).unwrap_or_default())
+}
+
+/// Replaces the editor's variables (empty map = reset to preset). Hand-written CSS is kept.
+#[tauri::command]
+pub fn set_theme_vars(core: State<Arc<Core>>, vars: BTreeMap<String, String>) -> Res<String> {
+    let current = std::fs::read_to_string(&core.paths.theme).unwrap_or_default();
+    let css = theme::with_editor_vars(&current, &vars).map_err(|e| e.to_string())?;
+    if let Some(dir) = core.paths.theme.parent() {
+        std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    }
+    std::fs::write(&core.paths.theme, &css).map_err(|e| e.to_string())?;
+    Ok(css)
 }
 
 #[tauri::command]

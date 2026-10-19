@@ -1,19 +1,22 @@
 <script lang="ts">
   import "$lib/theme.css";
-  import { invoke } from "@tauri-apps/api/core";
+  import { listen } from "@tauri-apps/api/event";
   import { onMount } from "svelte";
+  import { api } from "$lib/api";
+  import { setUserCss, theme } from "$lib/theme.svelte";
 
   let { children } = $props();
-  let userTheme = $state("");
 
-  // Injected after theme.css so the user's file wins. Live reload comes with the file watcher.
-  onMount(async () => {
-    userTheme = await invoke<string>("read_theme");
+  // Injected after theme.css so the user's file wins. The backend re-emits it on every file change.
+  onMount(() => {
+    const unlisten = listen<string>("theme", (e) => setUserCss(e.payload));
+    api.readTheme().then(setUserCss);
+    return () => unlisten.then((f) => f());
   });
 </script>
 
 <svelte:head>
-  {@html `<style id="user-theme">${userTheme.replaceAll("</", "<\\/")}</style>`}
+  {@html `<style id="user-theme">${theme.css.replaceAll("</", "<\\/")}</style>`}
 </svelte:head>
 
 {@render children()}
