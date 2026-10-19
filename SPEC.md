@@ -97,7 +97,10 @@ Stored in `~/.config/laverna/settings.json`, next to `theme.css`:
 - Default quality preset, container, audio conversion
 - Subtitles: include by default, languages, auto-generated captions
 - yt-dlp / ffmpeg custom paths (+ detected versions shown)
-- Cookies from browser (dropdown, default off)
+- Cookies from browser (dropdown, default off). Includes **Zen**, which yt-dlp doesn't know by
+  name: it's passed as `firefox:<profile dir>`, with the profile taken from Zen's `profiles.ini`
+  (`[Install…] Default=` first, then `Default=1`, then the first profile). Settings shows the
+  resolved profile path.
 - Rate limit (`-r`, default empty)
 - Extra yt-dlp args (free text, appended last)
 - Theme mode (system / dark / light)

@@ -1,3 +1,4 @@
+mod browsers;
 mod commands;
 mod core;
 mod queue;
@@ -63,6 +64,7 @@ pub fn run() {
             commands::detect_tools,
             commands::read_theme,
             commands::get_theme_vars,
+            commands::cookies_source,
             commands::set_theme_vars,
             commands::get_queue,
             commands::add_urls,

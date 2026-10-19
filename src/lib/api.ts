@@ -8,6 +8,7 @@ export const api = {
   readTheme: () => invoke<string>("read_theme"),
   getThemeVars: () => invoke<Record<string, string>>("get_theme_vars"),
   setThemeVars: (vars: Record<string, string>) => invoke<string>("set_theme_vars", { vars }),
+  cookiesSource: (browser: string) => invoke<string>("cookies_source", { browser }),
   getQueue: () => invoke<Queue>("get_queue"),
   addUrls: (urls: string, options: ItemOptions) => invoke<number[]>("add_urls", { urls, options }),
   removeItem: (id: number) => invoke<void>("remove_item", { id }),

@@ -1,5 +1,6 @@
 //! The single download worker: takes one pending item at a time and runs yt-dlp on it.
 
+use crate::browsers;
 use crate::core::{Core, Running};
 use crate::queue::ItemId;
 use crate::tools;
@@ -59,7 +60,8 @@ fn next_job(core: &Core) -> Option<Job> {
     };
     let built = std::fs::create_dir_all(&output_dir)
         .map_err(|e| format!("cannot create {}: {e}", output_dir.display()))
-        .and_then(|_| {
+        .and_then(|_| browsers::resolve_cookies(&settings))
+        .and_then(|settings| {
             args::download_args(
                 &url,
                 &opts,

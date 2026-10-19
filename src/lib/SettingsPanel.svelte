@@ -32,7 +32,32 @@
   let timer: ReturnType<typeof setTimeout> | undefined;
   let first = true;
 
-  const BROWSERS = ["firefox", "chrome", "chromium", "brave", "edge", "opera", "vivaldi", "safari", "whale"];
+  const BROWSERS = [
+    { value: "firefox", label: "Firefox" },
+    { value: "zen", label: "Zen" },
+    { value: "chrome", label: "Chrome" },
+    { value: "chromium", label: "Chromium" },
+    { value: "brave", label: "Brave" },
+    { value: "edge", label: "Edge" },
+    { value: "opera", label: "Opera" },
+    { value: "vivaldi", label: "Vivaldi" },
+    { value: "safari", label: "Safari" },
+    { value: "whale", label: "Whale" },
+  ];
+
+  // Zen has no yt-dlp name of its own; show which Firefox profile it maps to.
+  let cookiesSource = $state<{ ok: boolean; text: string } | null>(null);
+  $effect(() => {
+    const browser = form.cookies_from_browser;
+    if (browser !== "zen") {
+      cookiesSource = null;
+      return;
+    }
+    api
+      .cookiesSource(browser)
+      .then((text) => (cookiesSource = { ok: true, text: `Using ${text}` }))
+      .catch((e) => (cookiesSource = { ok: false, text: String(e) }));
+  });
   const nullable = (s: string) => (s.trim() ? s.trim() : null);
 
   function normalized(): Settings {
@@ -150,7 +175,7 @@
       <label for="s-cookies">Cookies from browser</label>
       <select id="s-cookies" bind:value={form.cookies_from_browser}>
         <option value="">Off</option>
-        {#each BROWSERS as b}<option value={b}>{b}</option>{/each}
+        {#each BROWSERS as b}<option value={b.value}>{b.label}</option>{/each}
       </select>
     </div>
     <div class="field">
@@ -158,6 +183,9 @@
       <input id="s-rate" bind:value={form.rate_limit} placeholder="Unlimited, e.g. 2M" spellcheck="false" />
     </div>
   </div>
+  {#if cookiesSource}
+    <small class:warn={!cookiesSource.ok}>{cookiesSource.text}</small>
+  {/if}
   <small>Cookies help with age-restricted videos and YouTube's “confirm you're not a bot” check.</small>
 
   <h3>Tools</h3>

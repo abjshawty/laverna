@@ -1,3 +1,4 @@
+use crate::browsers;
 use crate::core::Core;
 use crate::queue::{ItemId, Queue, QueueError};
 use crate::resolver;
@@ -73,6 +74,12 @@ pub fn set_theme_vars(core: State<Arc<Core>>, vars: BTreeMap<String, String>) ->
     }
     std::fs::write(&core.paths.theme, &css).map_err(|e| e.to_string())?;
     Ok(css)
+}
+
+/// What `--cookies-from-browser` will receive for `browser`, so Settings can show it.
+#[tauri::command]
+pub fn cookies_source(browser: String) -> Res<String> {
+    browsers::cookies_spec(&browser)
 }
 
 #[tauri::command]
