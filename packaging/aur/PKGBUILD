@@ -1,7 +1,7 @@
 # Maintainer: Timmy Kouadio-Bhegnin <kouadiobhegnino at gmail dot com>
 
 pkgname=laverna
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc="Minimal desktop app for downloading videos with yt-dlp"
 arch=('x86_64' 'aarch64')
