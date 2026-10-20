@@ -1,8 +1,7 @@
 # Maintainer: Timmy Kouadio-Bhegnin <kouadiobhegnino at gmail dot com>
 
-pkgname=laverna-dl
-_reponame=laverna
-pkgver=0.1.0
+pkgname=laverna
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="Minimal desktop app for downloading videos with yt-dlp"
 arch=('x86_64' 'aarch64')
@@ -27,10 +26,10 @@ makedepends=('bun' 'cargo')
 # The release profile already strips the binary, so a -debug package would be empty.
 options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('ac32f0df985c17f2a3677736f3afd7ace23b19d30cee911455a79795ee9df038')
+sha256sums=('SKIP')
 
 prepare() {
-  cd "$_reponame-$pkgver"
+  cd "$pkgname-$pkgver"
   export RUSTUP_TOOLCHAIN=stable
   export BUN_INSTALL_CACHE_DIR="$srcdir/bun-cache"
   bun install --frozen-lockfile
@@ -38,20 +37,20 @@ prepare() {
 }
 
 build() {
-  cd "$_reponame-$pkgver"
+  cd "$pkgname-$pkgver"
   export RUSTUP_TOOLCHAIN=stable
   # Builds the frontend (beforeBuildCommand) and the release binary; bundling is our job below.
   bun run tauri build --no-bundle -- --frozen
 }
 
 check() {
-  cd "$_reponame-$pkgver"
+  cd "$pkgname-$pkgver"
   export RUSTUP_TOOLCHAIN=stable
   cargo test --frozen --release --manifest-path src-tauri/Cargo.toml
 }
 
 package() {
-  cd "$_reponame-$pkgver"
+  cd "$pkgname-$pkgver"
   install -Dm755 "src-tauri/target/release/$pkgname" "$pkgdir/usr/bin/$pkgname"
   install -Dm644 "packaging/linux/$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
 

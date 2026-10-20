@@ -16,9 +16,6 @@ See [SPEC.md](SPEC.md) for the full design.
 
 ### Arch Linux
 
-The package is `laverna-dl` (the AUR name `laverna` belongs to an unrelated note-taking app).
-The binary is `laverna-dl`; the app still shows up as Laverna.
-
 Build and install it with `makepkg` from the PKGBUILD in this repo:
 
 ```sh
@@ -98,14 +95,16 @@ bun run tauri icon assets/icon.png
    with your SSH key):
 
    ```sh
-   git clone ssh://aur@aur.archlinux.org/laverna-dl.git ~/aur/laverna-dl   # first time only
-   cp packaging/aur/{PKGBUILD,.SRCINFO} ~/aur/laverna-dl/
-   cd ~/aur/laverna-dl
+   git clone ssh://aur@aur.archlinux.org/laverna.git ~/aur/laverna   # first time only
+   cp packaging/aur/{PKGBUILD,.SRCINFO} ~/aur/laverna/
+   cd ~/aur/laverna
    git commit -am "Update to <version>"
    git push
    ```
 
    Only `PKGBUILD` and `.SRCINFO` go to the AUR; the first push needs `git add` for both files.
+   The AUR name `laverna` is already taken by an unrelated note-taking app that also installs
+   `/usr/bin/laverna`, so publishing needs a different `pkgname` (and binary name) at that point.
 
 ## Theming
 
