@@ -87,7 +87,11 @@ yt-dlp-supported URL works), with a sequential download queue and a user-customi
   kept at the end of the file; its overrides apply in both modes.
 - Presets use zero-specificity selectors (`:where()`), so any user `:root { … }` rule wins.
 - Mode setting: Follow system (default) / Dark / Light.
-- Omarchy theme import: later, not v1.
+- Omarchy theme sync: on Omarchy (`ID=omarchy` in `/etc/os-release`), the theme editor offers
+  "Install Omarchy theme sync" until `~/.config/omarchy/hooks/theme-set.d/sync-laverna-theme`
+  exists. Installing downloads that `theme-set` hook and runs it once. The hook copies the current
+  Omarchy theme's colors into a marked block (`/* omarchy-sync:start */ … /* omarchy-sync:end */`)
+  at the top of `theme.css` on every theme change, so the editor's block still wins.
 
 ## Settings
 

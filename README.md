@@ -144,6 +144,15 @@ that file and leaves the rest alone.
 Overrides in a plain `:root { … }` rule apply in both light and dark mode, and always win over the
 presets. The mode itself (follow system, dark, or light) is set in **Settings → Appearance**.
 
+### Omarchy
+
+On [Omarchy](https://omarchy.org), the theme editor has an **Install Omarchy theme sync** button.
+It installs a hook at `~/.config/omarchy/hooks/theme-set.d/sync-laverna-theme` and runs it once,
+so Laverna takes the current Omarchy theme's colors now and follows every later
+`omarchy theme set`. The hook writes its colors to a marked block at the top of `theme.css`;
+your own rules and the editor's section come after it, so they still win. The button disappears
+once the hook is installed; to uninstall, delete that file and the `omarchy-sync` block.
+
 ### Variables
 
 | Variable | What it styles | Dark | Light |

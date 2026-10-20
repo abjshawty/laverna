@@ -1,5 +1,6 @@
 use crate::browsers;
 use crate::core::Core;
+use crate::omarchy;
 use crate::queue::{ItemId, Queue, QueueError};
 use crate::resolver;
 use crate::settings::Settings;
@@ -74,6 +75,17 @@ pub fn set_theme_vars(core: State<Arc<Core>>, vars: BTreeMap<String, String>) ->
     }
     std::fs::write(&core.paths.theme, &css).map_err(|e| e.to_string())?;
     Ok(css)
+}
+
+/// Whether to offer installing the Omarchy theme sync hook.
+#[tauri::command]
+pub fn omarchy_sync_available() -> bool {
+    omarchy::can_install_sync()
+}
+
+#[tauri::command]
+pub async fn install_omarchy_sync() -> Res {
+    omarchy::install_sync().await
 }
 
 /// What `--cookies-from-browser` will receive for `browser`, so Settings can show it.

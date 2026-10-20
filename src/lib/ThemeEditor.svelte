@@ -8,10 +8,14 @@
   /** Effective values after all CSS applies, for showing what's in use. */
   let computed = $state<Record<string, string>>({});
   let error = $state("");
+  /** On Omarchy without the theme-set hook installed yet. */
+  let canSync = $state(false);
+  let installing = $state(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   onMount(async () => {
     vars = await api.getThemeVars();
+    canSync = await api.omarchySyncAvailable();
   });
 
   // Recompute effective values whenever the user CSS or the mode changes.
@@ -49,6 +53,20 @@
   function resetAll() {
     vars = {};
     save(0);
+  }
+
+  async function installSync() {
+    installing = true;
+    try {
+      await api.installOmarchySync();
+      error = "";
+    } catch (e) {
+      error = `Omarchy theme sync: ${e}`;
+    } finally {
+      // The hook may be installed even if its first run failed.
+      canSync = await api.omarchySyncAvailable();
+      installing = false;
+    }
   }
 </script>
 
@@ -91,6 +109,11 @@
 
   <div class="footer">
     <button type="button" onclick={resetAll} disabled={Object.keys(vars).length === 0}>Reset all to preset</button>
+    {#if canSync}
+      <button type="button" onclick={installSync} disabled={installing}>
+        {installing ? "Installing…" : "Install Omarchy theme sync"}
+      </button>
+    {/if}
   </div>
   <p class="note">
     Changes are saved to the editor's section of <code>~/.config/laverna/theme.css</code>. They apply in both light
@@ -139,6 +162,9 @@
   }
   .footer {
     margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
   .note {
     color: var(--muted);

@@ -1,6 +1,7 @@
 mod browsers;
 mod commands;
 mod core;
+mod omarchy;
 mod queue;
 mod resolver;
 mod settings;
@@ -77,6 +78,8 @@ pub fn run() {
             commands::resume_queue,
             commands::clear_finished,
             commands::get_log,
+            commands::omarchy_sync_available,
+            commands::install_omarchy_sync,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
