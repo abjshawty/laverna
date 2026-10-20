@@ -118,7 +118,10 @@ pub fn set_item_options(core: State<Arc<Core>>, id: ItemId, options: ItemOptions
 
 #[tauri::command]
 pub fn retry_item(core: State<Arc<Core>>, id: ItemId) -> Res {
-    core.update(|q| q.retry(id)).map_err(err)
+    if core.update(|q| q.retry(id)).map_err(err)? {
+        resolver::spawn(core.inner().clone(), id);
+    }
+    Ok(())
 }
 
 #[tauri::command]

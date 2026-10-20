@@ -202,6 +202,13 @@ impl Queue {
     /// yt-dlp exited 0. No final path means the archive skipped it.
     pub fn finish(&mut self, id: ItemId, path: Option<String>) -> Result<(), QueueError> {
         let item = self.downloading_mut(id)?;
+        // The lookup may have failed (e.g. before cookies were set up); the file name is the next best title.
+        if item.meta.title.is_none() {
+            item.meta.title = path
+                .as_deref()
+                .and_then(|p| Path::new(p).file_stem())
+                .map(|s| s.to_string_lossy().into_owned());
+        }
         item.status = match path {
             Some(p) => Status::Done { path: Some(p) },
             None => Status::Skipped,
@@ -221,7 +228,9 @@ impl Queue {
     }
 
     /// Failed/cancelled → pending. Skipped → pending with `force` ("download anyway").
-    pub fn retry(&mut self, id: ItemId) -> Result<(), QueueError> {
+    /// An item whose lookup found nothing is marked unresolved; returns true if the caller
+    /// should run the lookup again.
+    pub fn retry(&mut self, id: ItemId) -> Result<bool, QueueError> {
         let item = self.get_mut(id)?;
         match item.status {
             Status::Failed { .. } | Status::Cancelled => {}
@@ -229,7 +238,11 @@ impl Queue {
             _ => return Err(QueueError::InvalidState(id)),
         }
         item.status = Status::Pending;
-        Ok(())
+        let lookup_again = item.meta.title.is_none();
+        if lookup_again {
+            item.meta.resolved = false;
+        }
+        Ok(lookup_again)
     }
 
     /// Pausing stops the current download; it goes back to pending so resume picks it up first.
@@ -325,6 +338,29 @@ mod tests {
     }
 
     #[test]
+    fn finish_fills_missing_title_from_file_name() {
+        let (mut q, ids) = queue_of(2);
+        q.set_meta(ids[1], Metadata { title: Some("Real title".into()), resolved: true, ..Default::default() })
+            .unwrap();
+        q.start_next();
+        q.finish(ids[0], Some("/out/My video [abc].mkv".into())).unwrap();
+        assert_eq!(q.get(ids[0]).unwrap().meta.title.as_deref(), Some("My video [abc]"));
+        q.start_next();
+        q.finish(ids[1], Some("/out/other.mkv".into())).unwrap();
+        assert_eq!(q.get(ids[1]).unwrap().meta.title.as_deref(), Some("Real title"));
+    }
+
+    #[test]
+    fn retry_keeps_known_title_resolved() {
+        let (mut q, ids) = queue_of(1);
+        q.set_meta(ids[0], Metadata { title: Some("T".into()), resolved: true, ..Default::default() }).unwrap();
+        q.start_next();
+        q.fail(ids[0], "x".into(), false).unwrap();
+        assert_eq!(q.retry(ids[0]), Ok(false));
+        assert!(q.get(ids[0]).unwrap().meta.resolved);
+    }
+
+    #[test]
     fn failure_moves_on() {
         let (mut q, ids) = queue_of(2);
         q.start_next();
@@ -349,7 +385,8 @@ mod tests {
         let (mut q, ids) = queue_of(1);
         q.start_next();
         q.cancel(ids[0]).unwrap();
-        assert_eq!(q.retry(ids[0]), Ok(()));
+        assert_eq!(q.retry(ids[0]), Ok(true), "no title yet, so look it up again");
+        assert!(!q.get(ids[0]).unwrap().meta.resolved);
         assert_eq!(q.retry(ids[0]), Err(QueueError::InvalidState(ids[0])));
     }
 
