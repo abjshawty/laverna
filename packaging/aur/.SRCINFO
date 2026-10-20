@@ -22,6 +22,6 @@ pkgbase = laverna-dl
 	depends = yt-dlp
 	options = !debug
 	source = laverna-dl-0.1.0.tar.gz::https://github.com/abjshawty/laverna/archive/refs/tags/v0.1.0.tar.gz
-	sha256sums = SKIP
+	sha256sums = ac32f0df985c17f2a3677736f3afd7ace23b19d30cee911455a79795ee9df038
 
 pkgname = laverna-dl

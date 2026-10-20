@@ -27,7 +27,7 @@ makedepends=('bun' 'cargo')
 # The release profile already strips the binary, so a -debug package would be empty.
 options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('ac32f0df985c17f2a3677736f3afd7ace23b19d30cee911455a79795ee9df038')
 
 prepare() {
   cd "$_reponame-$pkgver"
