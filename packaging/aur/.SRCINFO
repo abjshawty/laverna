@@ -1,6 +1,6 @@
 pkgbase = laverna
 	pkgdesc = Minimal desktop app for downloading videos with yt-dlp
-	pkgver = 0.1.1
+	pkgver = 0.1.2
 	pkgrel = 1
 	url = https://github.com/abjshawty/laverna
 	arch = x86_64
@@ -21,7 +21,7 @@ pkgbase = laverna
 	depends = webkit2gtk-4.1
 	depends = yt-dlp
 	options = !debug
-	source = laverna-0.1.1.tar.gz::https://github.com/abjshawty/laverna/archive/refs/tags/v0.1.1.tar.gz
-	sha256sums = a94110653dde32509fc7cae6e040d37140ae6cb40aa9b0f28d096a9c58b425aa
+	source = laverna-0.1.2.tar.gz::https://github.com/abjshawty/laverna/archive/refs/tags/v0.1.2.tar.gz
+	sha256sums = 4cf1bc9a3eb4d4e6198039f93f02f68713811433e435b450b8eca4f2c1f98ca1
 
 pkgname = laverna
