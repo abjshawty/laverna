@@ -16,20 +16,28 @@ See [SPEC.md](SPEC.md) for the full design.
 
 ### Arch Linux
 
-Build and install it with `makepkg` from the PKGBUILD in this repo:
+The PKGBUILD lives in its own repo, [gitlab.com/abjshawty/laverna](https://gitlab.com/abjshawty/laverna).
+Clone it, then build and install with `makepkg` or `yay`:
 
 ```sh
-git clone https://github.com/abjshawty/laverna
-cd laverna/packaging/aur
-makepkg -si
+git clone https://gitlab.com/abjshawty/laverna.git laverna-pkgbuild
+cd laverna-pkgbuild
+
+makepkg -si    # build and install, pulling in dependencies with pacman
+# or
+yay -Bi .      # same, via yay
 ```
+
+To update later: `git pull`, then run the same command again.
 
 `-s` installs the build dependencies (`bun`, `cargo`) and `-i` installs the package, which pulls
 in `yt-dlp`, `ffmpeg` and `webkit2gtk-4.1`. The PKGBUILD downloads the tagged release from GitHub,
-so this builds the version in `pkgver`, not your working tree.
+so this builds the version in `pkgver`, not your working tree. The same PKGBUILD is also in this
+repo under `packaging/aur/`, so `cd packaging/aur && makepkg -si` works from a clone of this repo.
 
 If your Rust toolchain comes from the rustup install script rather than pacman, pacman doesn't
-know about `cargo`; install `bun` yourself and run `makepkg -si --nodeps` instead.
+know about `cargo`; install `bun` yourself and run `makepkg -si --nodeps` instead (yay resolves
+dependencies itself, so use makepkg for this).
 
 ### AppImage and .deb
 
@@ -91,20 +99,19 @@ bun run tauri icon assets/icon.png
    For a check that the declared dependencies are complete, build in a clean chroot with
    `pkgctl build` (from `devtools`).
 
-4. Commit the updated `PKGBUILD` and `.SRCINFO`, then publish to the AUR (needs an AUR account
-   with your SSH key):
+4. Commit the updated `PKGBUILD` and `.SRCINFO` here, then mirror them to the PKGBUILD repo
+   (`packaging/aur/` in this repo is the source of truth):
 
    ```sh
-   git clone ssh://aur@aur.archlinux.org/laverna.git ~/aur/laverna   # first time only
-   cp packaging/aur/{PKGBUILD,.SRCINFO} ~/aur/laverna/
-   cd ~/aur/laverna
+   cp packaging/aur/{PKGBUILD,.SRCINFO} ~/Projects/laverna/
+   cd ~/Projects/laverna
    git commit -am "Update to <version>"
    git push
    ```
 
-   Only `PKGBUILD` and `.SRCINFO` go to the AUR; the first push needs `git add` for both files.
-   The AUR name `laverna` is already taken by an unrelated note-taking app that also installs
-   `/usr/bin/laverna`, so publishing needs a different `pkgname` (and binary name) at that point.
+   Publishing to the AUR later works the same way, with `ssh://aur@aur.archlinux.org/<pkgname>.git`
+   as the repo. The AUR name `laverna` is already taken by an unrelated note-taking app that also
+   installs `/usr/bin/laverna`, so that will need a different `pkgname` (and binary name).
 
 ## Theming
 
