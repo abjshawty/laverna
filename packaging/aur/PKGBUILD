@@ -8,19 +8,24 @@ pkgdesc="Minimal desktop app for downloading videos with yt-dlp"
 arch=('x86_64' 'aarch64')
 url="https://github.com/abjshawty/laverna"
 license=('MIT')
+# Libraries from the binary's NEEDED entries, plus the tools it runs and the icon theme.
 depends=(
   'cairo'
+  'dbus'
   'ffmpeg'
   'gdk-pixbuf2'
   'glib2'
+  'glibc'
   'gtk3'
   'hicolor-icon-theme'
+  'libgcc'
   'libsoup3'
-  'pango'
   'webkit2gtk-4.1'
   'yt-dlp'
 )
 makedepends=('bun' 'cargo')
+# The release profile already strips the binary, so a -debug package would be empty.
+options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
