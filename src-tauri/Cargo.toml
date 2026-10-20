@@ -1,5 +1,5 @@
 [package]
-name = "laverna"
+name = "laverna-dl"
 version = "0.1.0"
 description = "A minimal yt-dlp desktop app"
 license = "MIT"

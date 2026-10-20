@@ -1895,7 +1895,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "laverna"
+name = "laverna-dl"
 version = "0.1.0"
 dependencies = [
  "libc",

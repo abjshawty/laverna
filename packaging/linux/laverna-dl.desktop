@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Laverna
+GenericName=Video Downloader
+Comment=Download videos with yt-dlp
+Exec=laverna-dl
+Icon=laverna-dl
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=youtube;yt-dlp;download;video;
+StartupWMClass=laverna-dl

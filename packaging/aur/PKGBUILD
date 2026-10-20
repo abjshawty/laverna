@@ -1,0 +1,62 @@
+# Maintainer: Timmy Kouadio-Bhegnin <kouadiobhegnino at gmail dot com>
+
+pkgname=laverna-dl
+_reponame=laverna
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Minimal desktop app for downloading videos with yt-dlp"
+arch=('x86_64' 'aarch64')
+url="https://github.com/abjshawty/laverna"
+license=('MIT')
+depends=(
+  'cairo'
+  'ffmpeg'
+  'gdk-pixbuf2'
+  'glib2'
+  'gtk3'
+  'hicolor-icon-theme'
+  'libsoup3'
+  'pango'
+  'webkit2gtk-4.1'
+  'yt-dlp'
+)
+makedepends=('bun' 'cargo')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "$_reponame-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export BUN_INSTALL_CACHE_DIR="$srcdir/bun-cache"
+  bun install --frozen-lockfile
+  cargo fetch --locked --target "$(rustc --print host-tuple)" --manifest-path src-tauri/Cargo.toml
+}
+
+build() {
+  cd "$_reponame-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  # Builds the frontend (beforeBuildCommand) and the release binary; bundling is our job below.
+  bun run tauri build --no-bundle -- --frozen
+}
+
+check() {
+  cd "$_reponame-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo test --frozen --release --manifest-path src-tauri/Cargo.toml
+}
+
+package() {
+  cd "$_reponame-$pkgver"
+  install -Dm755 "src-tauri/target/release/$pkgname" "$pkgdir/usr/bin/$pkgname"
+  install -Dm644 "packaging/linux/$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
+
+  local icons="$pkgdir/usr/share/icons/hicolor"
+  for size in 32 64 128; do
+    install -Dm644 "src-tauri/icons/${size}x${size}.png" "$icons/${size}x${size}/apps/$pkgname.png"
+  done
+  install -Dm644 src-tauri/icons/128x128@2x.png "$icons/256x256/apps/$pkgname.png"
+  install -Dm644 src-tauri/icons/icon.png "$icons/512x512/apps/$pkgname.png"
+  install -Dm644 assets/icon.svg "$icons/scalable/apps/$pkgname.svg"
+
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
